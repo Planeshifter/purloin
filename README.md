@@ -142,4 +142,4 @@ purloin -f purls.txt -x -o ./packages -v
 
 ## License
 
-MIT
+Apache-2.0
