@@ -1,0 +1,9 @@
+node_modules
+dist
+scripts
+coverage
+*.tgz
+*.tar
+*.zip
+*.gem
+*.crate

@@ -1,0 +1,47 @@
+{
+  "name": "purloin",
+  "version": "1.0.0",
+  "description": "Download package tarballs from Package URLs (PURLs)",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "purloin": "./bin/purloin.ts"
+  },
+  "scripts": {
+    "start": "node --experimental-strip-types --experimental-transform-types src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "oxlint src tests",
+    "lint:fix": "oxlint src tests --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build:exe": "./scripts/build-executable.sh"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "ora": "^9.0.0",
+    "p-queue": "^9.0.1",
+    "p-retry": "^7.1.1",
+    "packageurl-js": "^2.0.1",
+    "tar": "^7.5.2"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^25.0.3",
+    "@vitest/coverage-v8": "^4.0.16",
+    "esbuild": "^0.27.2",
+    "msw": "^2.12.4",
+    "oxlint": "^1.34.0",
+    "postject": "1.0.0-alpha.6",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}
