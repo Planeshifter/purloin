@@ -1,7 +1,13 @@
 import chalk from 'chalk';
 import ora from 'ora';
 import type { Ora } from 'ora';
-import type { DownloadTask, DownloadResult, CliOptions, DownloadSummary } from '../types/index.ts';
+import type {
+  DownloadTask,
+  DownloadResult,
+  CliOptions,
+  DownloadSummary,
+  RecoveryResult,
+} from '../types/index.ts';
 
 export class Logger {
   private spinner: Ora | null = null;
@@ -112,6 +118,96 @@ export class Logger {
     }
   }
 
+  startRecovery(task: DownloadTask): void {
+    if (this.options.quiet) return;
+
+    if (this.spinner) {
+      this.spinner.stop();
+    }
+
+    console.log(chalk.yellow('↳'), `Attempting recovery for ${task.purl.raw}...`);
+
+    this.spinner = null;
+    this.updateSpinner();
+  }
+
+  completeRecovery(
+    task: DownloadTask,
+    result: DownloadResult,
+    recoveryResult: RecoveryResult
+  ): void {
+    this.completed++;
+    this.activeTasks.delete(task.purl.raw);
+
+    if (!this.options.quiet) {
+      if (this.spinner) {
+        this.spinner.stop();
+      }
+
+      // Show which sources were tried
+      if (this.options.verbose) {
+        console.log('');
+        console.log(chalk.gray('  Recovery sources:'));
+        for (const source of recoveryResult.sources) {
+          const statusIcon =
+            source.status === 'found'
+              ? chalk.green('✓')
+              : source.status === 'partial'
+                ? chalk.yellow('◐')
+                : source.status === 'metadata_only'
+                  ? chalk.gray('○')
+                  : chalk.red('✗');
+          const details = source.archiveDate ? chalk.gray(` (${source.archiveDate})`) : '';
+          console.log(`  ${statusIcon} ${source.source}${details}`);
+        }
+        console.log('');
+      }
+
+      const sizeStr = result.bytesDownloaded ? this.formatBytes(result.bytesDownloaded) : '';
+      const timeStr = result.duration ? this.formatDuration(result.duration) : '';
+      const details = [sizeStr, timeStr].filter(Boolean).join(', ');
+      const source = result.recoveredFrom ? chalk.cyan(` via ${result.recoveredFrom}`) : '';
+
+      console.log(
+        chalk.green('✔'),
+        `${task.purl.type}/${task.filename}${source}` + (details ? chalk.gray(` (${details})`) : '')
+      );
+
+      this.spinner = null;
+      this.updateSpinner();
+    }
+  }
+
+  failRecovery(task: DownloadTask, recoveryResult: RecoveryResult): void {
+    if (!this.options.quiet) {
+      if (this.spinner) {
+        this.spinner.stop();
+      }
+
+      // Show which sources were tried
+      if (this.options.verbose) {
+        console.log(chalk.gray('  Recovery sources:'));
+        for (const source of recoveryResult.sources) {
+          const statusIcon =
+            source.status === 'found'
+              ? chalk.green('✓')
+              : source.status === 'partial'
+                ? chalk.yellow('◐')
+                : source.status === 'metadata_only'
+                  ? chalk.gray('○')
+                  : source.status === 'not_found'
+                    ? chalk.gray('-')
+                    : chalk.red('✗');
+          const errorMsg = source.error ? chalk.red(` (${source.error})`) : '';
+          console.log(`  ${statusIcon} ${source.source}${errorMsg}`);
+        }
+      }
+
+      this.spinner = null;
+      this.updateSpinner();
+    }
+  }
+
   stop(): void {
     if (this.spinner) {
       this.spinner.clear();
@@ -130,7 +226,11 @@ export class Logger {
     console.log('');
     console.log(chalk.bold('Download Summary:'));
     console.log(`  Total:      ${summary.total}`);
-    console.log(`  ${chalk.green('Successful:')} ${summary.successful}`);
+
+    // Show successful count with recovery info
+    const recoveredNote =
+      summary.recovered > 0 ? chalk.cyan(` (${summary.recovered} recovered)`) : '';
+    console.log(`  ${chalk.green('Successful:')} ${summary.successful}${recoveredNote}`);
     console.log(`  ${chalk.red('Failed:')}     ${summary.failed}`);
 
     if (summary.errors.length > 0) {

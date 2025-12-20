@@ -15,6 +15,45 @@ export const ECOSYSTEM_TYPES = [
 
 export type EcosystemType = (typeof ECOSYSTEM_TYPES)[number];
 
+// Ecosystems that support recovery from CDN caches and mirrors
+export const RECOVERABLE_ECOSYSTEMS = ['npm', 'pypi', 'gem'] as const;
+export type RecoverableEcosystem = (typeof RECOVERABLE_ECOSYSTEMS)[number];
+
+// Recovery source status
+export type SourceStatus = 'found' | 'partial' | 'metadata_only' | 'not_found' | 'error';
+
+// Per-source probe/download result
+export interface SourceResult {
+  source: string;
+  status: SourceStatus;
+  url?: string;
+  archiveDate?: string;
+  fileCount?: number;
+  error?: string;
+}
+
+// Full recovery result
+export interface RecoveryResult {
+  purl: ParsedPurl;
+  sources: SourceResult[];
+  recovered: boolean;
+  outputPath?: string;
+  sha256?: string;
+  bytesDownloaded?: number;
+}
+
+// Recovery source handler interface
+export interface SourceHandler {
+  readonly name: string;
+  readonly ecosystems: readonly RecoverableEcosystem[];
+
+  // Check if package exists in this source
+  probe(purl: ParsedPurl, timeout: number): Promise<SourceResult>;
+
+  // Download the package (if found)
+  download(purl: ParsedPurl, outputPath: string, timeout: number): Promise<SourceResult>;
+}
+
 // Parsed PURL with required version
 export interface ParsedPurl {
   type: EcosystemType;
@@ -42,6 +81,9 @@ export interface DownloadResult {
   bytesDownloaded?: number;
   duration?: number;
   extractedPath?: string;
+  // Recovery info (if recovered from alternative source)
+  recoveredFrom?: string;
+  recoveryAttempted?: boolean;
 }
 
 // Download summary
@@ -49,6 +91,7 @@ export interface DownloadSummary {
   total: number;
   successful: number;
   failed: number;
+  recovered: number;
   errors: Array<{ purl: string; error: Error }>;
 }
 
@@ -65,6 +108,9 @@ export interface CliOptions {
   verbose: boolean;
   quiet: boolean;
   extract: boolean;
+  // Recovery options
+  recover: boolean;
+  sources?: string[];
 }
 
 // Registry handler interface
@@ -118,5 +164,11 @@ export class NetworkError extends PurlDownloaderError {
 export class ExtractionError extends PurlDownloaderError {
   constructor(filePath: string, details: string) {
     super(`Extraction failed for ${filePath}: ${details}`, 'EXTRACTION_ERROR');
+  }
+}
+
+export class RecoveryError extends PurlDownloaderError {
+  constructor(purl: string, details: string) {
+    super(`Recovery failed for ${purl}: ${details}`, 'RECOVERY_ERROR');
   }
 }

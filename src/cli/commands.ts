@@ -3,11 +3,16 @@ import { collectPurls } from './input.ts';
 import { parsePurls } from '../purl/parser.ts';
 import { downloadAll } from '../downloader/index.ts';
 import { Logger } from '../utils/logger.ts';
+import { parseSourcesOption } from '../recovery/index.ts';
 
 export async function downloadCommand(
   purls: string[],
   rawOptions: Record<string, unknown>
 ): Promise<void> {
+  // Parse and validate sources option
+  const sourcesArg = rawOptions.sources as string | undefined;
+  const { valid: validSources, invalid: invalidSources } = parseSourcesOption(sourcesArg);
+
   const options: CliOptions = {
     file: rawOptions.file as string | undefined,
     stdin: rawOptions.stdin as boolean,
@@ -20,9 +25,16 @@ export async function downloadCommand(
     verbose: rawOptions.verbose as boolean,
     quiet: rawOptions.quiet as boolean,
     extract: rawOptions.extract as boolean,
+    recover: rawOptions.recover as boolean,
+    sources: validSources.length > 0 ? validSources : undefined,
   };
 
   const logger = new Logger(options);
+
+  // Warn about invalid source names
+  if (invalidSources.length > 0) {
+    logger.warn(`Unknown recovery sources: ${invalidSources.join(', ')}`);
+  }
 
   try {
     // Collect PURLs from all sources
@@ -39,6 +51,9 @@ export async function downloadCommand(
     logger.info(`Found ${allPurlStrings.length} PURL(s) to download`);
     logger.verbose(`Output directory: ${options.output}`);
     logger.verbose(`Concurrency: ${options.concurrency}`);
+    if (options.recover) {
+      logger.verbose('Recovery mode enabled - will try CDN caches on failure');
+    }
 
     // Parse PURLs
     const parsedPurls = parsePurls(allPurlStrings);

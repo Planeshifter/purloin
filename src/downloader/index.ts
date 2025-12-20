@@ -38,6 +38,7 @@ export async function downloadAll(
     total: purls.length,
     successful: 0,
     failed: 0,
+    recovered: 0,
     errors: [],
   };
 
@@ -96,6 +97,9 @@ export async function downloadAll(
     if (result.status === 'fulfilled') {
       if (result.value.success) {
         summary.successful++;
+        if (result.value.recoveredFrom) {
+          summary.recovered++;
+        }
       } else {
         summary.failed++;
         if (result.value.error) {

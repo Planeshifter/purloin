@@ -21,6 +21,8 @@ program
   .option('-x, --extract', 'Extract archives after downloading', false)
   .option('-v, --verbose', 'Verbose output', false)
   .option('-q, --quiet', 'Suppress output except errors', false)
+  .option('-R, --recover', 'Enable recovery from CDN caches if registry fails', false)
+  .option('--sources <list>', 'Comma-separated list of recovery sources to try')
   .action(downloadCommand);
 
 program.parse();

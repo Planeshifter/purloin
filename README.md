@@ -57,21 +57,21 @@ purloin -d pkg:maven/org.apache.commons/commons-lang3@3.12.0
 
 ## Supported Ecosystems
 
-| Type         | PURL Example                                        | Registry         |
-| ------------ | --------------------------------------------------- | ---------------- |
-| npm          | `pkg:npm/lodash@4.17.21`                            | npmjs.org        |
-| npm (scoped) | `pkg:npm/@babel/core@7.23.0`                        | npmjs.org        |
-| pypi         | `pkg:pypi/requests@2.31.0`                          | pypi.org         |
-| maven        | `pkg:maven/org.apache.commons/commons-lang3@3.12.0` | maven.apache.org |
-| gem          | `pkg:gem/rails@7.1.0`                               | rubygems.org     |
-| cargo        | `pkg:cargo/serde@1.0.193`                           | crates.io        |
-| nuget        | `pkg:nuget/Newtonsoft.Json@13.0.3`                  | nuget.org        |
-| golang       | `pkg:golang/github.com/gorilla/mux@v1.8.1`          | proxy.golang.org |
-| hex          | `pkg:hex/phoenix@1.7.10`                            | hex.pm           |
-| composer     | `pkg:composer/monolog/monolog@3.5.0`                | packagist.org    |
-| vscode       | `pkg:vscode/ms-python/python@2024.0.1`              | VS Code Marketplace |
-| vscode       | `pkg:vscode/redhat/vscode-yaml@1.14.0?repository_url=https://open-vsx.org` | Open VSX |
-| chrome       | `pkg:chrome/cjpalhdlnbpafiamejdnhcphjbkeiagm@1.55.0` | Chrome Web Store |
+| Type         | PURL Example                                                               | Registry            |
+| ------------ | -------------------------------------------------------------------------- | ------------------- |
+| npm          | `pkg:npm/lodash@4.17.21`                                                   | npmjs.org           |
+| npm (scoped) | `pkg:npm/@babel/core@7.23.0`                                               | npmjs.org           |
+| pypi         | `pkg:pypi/requests@2.31.0`                                                 | pypi.org            |
+| maven        | `pkg:maven/org.apache.commons/commons-lang3@3.12.0`                        | maven.apache.org    |
+| gem          | `pkg:gem/rails@7.1.0`                                                      | rubygems.org        |
+| cargo        | `pkg:cargo/serde@1.0.193`                                                  | crates.io           |
+| nuget        | `pkg:nuget/Newtonsoft.Json@13.0.3`                                         | nuget.org           |
+| golang       | `pkg:golang/github.com/gorilla/mux@v1.8.1`                                 | proxy.golang.org    |
+| hex          | `pkg:hex/phoenix@1.7.10`                                                   | hex.pm              |
+| composer     | `pkg:composer/monolog/monolog@3.5.0`                                       | packagist.org       |
+| vscode       | `pkg:vscode/ms-python/python@2024.0.1`                                     | VS Code Marketplace |
+| vscode       | `pkg:vscode/redhat/vscode-yaml@1.14.0?repository_url=https://open-vsx.org` | Open VSX            |
+| chrome       | `pkg:chrome/cjpalhdlnbpafiamejdnhcphjbkeiagm@1.55.0`                       | Chrome Web Store    |
 
 ## Output Structure
 
